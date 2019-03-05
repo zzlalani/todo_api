@@ -10,7 +10,6 @@ module.exports = function (fastify, opts, next) {
                 email: { format: 'email' },
                 password: { type: 'string', minLength: 6 },
             }
-
         }
     };
 
@@ -23,11 +22,9 @@ module.exports = function (fastify, opts, next) {
             promise.then(data => {
                 res.send(data);
             }).catch(err => {
-                res.code(500).send(data);
+                res.code(500).send(err.message);
             });
-
         }
-
     });
 
     next();
