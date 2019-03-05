@@ -14,6 +14,9 @@ fastify.register(require('fastify-firebase-auth'), {
     storageBucket: process.env.STORAGEBUCKET
 });
 
+fastify.register(require('./plugins/fastify-firebase'));
+fastify.register(require('./middlewares/authenticated'));
+console.log(fastify.isAuthenticated);
 fastify.get('/', (req, res) => {
     res.send({
         'message': 'Welcome to Todo App WebServices'
@@ -22,6 +25,9 @@ fastify.get('/', (req, res) => {
 
 // auth
 fastify.register(require('./routes/auth'), { prefix: '/' });
+
+// todolist
+fastify.register(require('./routes/todolist'), { prefix: '/todolist' });
 
 // Run the server!
 fastify.listen(3000, (err, address) => {

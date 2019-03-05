@@ -14,7 +14,6 @@ module.exports = function (fastify, opts, next) {
     };
 
     fastify.post('/register', { schema: loginSchema, attachValidation: true }, (req, res) => {
-        // fastify.auth.createUserWithEmailAndPassword()
         if ( req.validationError ) {
             res.code(400).send(req.validationError);
         } else {
