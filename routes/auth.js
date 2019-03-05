@@ -27,5 +27,18 @@ module.exports = function (fastify, opts, next) {
         }
     });
 
+    fastify.post('/login', { schema: schema, attachValidation: true }, (req, res) => {
+        if ( req.validationError ) {
+            res.code(400).send(req.validationError);
+        } else {
+            let promise = fastify.auth.signInWithEmailAndPassword(req.body.email, req.body.password);
+            promise.then(data => {
+                res.send(data);
+            }).catch(err => {
+                res.code(500).send(err.message);
+            });
+        }
+    });
+
     next();
 };
