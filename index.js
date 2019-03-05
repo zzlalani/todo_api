@@ -14,6 +14,12 @@ fastify.register(require('fastify-firebase-auth'), {
     storageBucket: process.env.STORAGEBUCKET
 });
 
+fastify.get('/', (req, res) => {
+    res.send({
+        'message': 'Welcome to Todo App WebServices'
+    })
+});
+
 // auth
 fastify.register(require('./routes/auth'), { prefix: '/' });
 
