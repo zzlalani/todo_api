@@ -11,7 +11,7 @@ module.exports = function (fastify, opts, next) {
         }
     };
 
-    fastify.post('/:list_id', { preHandler: fastify.isAuthenticated,  schema: todoSchema, attachValidation: true }, (req, res) => {
+    fastify.post('/:list_id', { preHandler: fastify.isAuthenticated, schema: todoSchema, attachValidation: true }, (req, res) => {
         if ( req.validationError ) {
             res.code(400).send(req.validationError);
         } else {
@@ -37,7 +37,7 @@ module.exports = function (fastify, opts, next) {
         }
     });
 
-    fastify.put('/:list_id/:todo_id', { preHandler: fastify.isAuthenticated,  schema: todoSchema, attachValidation: true }, (req, res) => {
+    fastify.put('/:list_id/:todo_id', { preHandler: fastify.isAuthenticated, schema: todoSchema, attachValidation: true }, (req, res) => {
         if ( req.validationError ) {
             res.code(400).send(req.validationError);
         } else {
@@ -57,6 +57,40 @@ module.exports = function (fastify, opts, next) {
                 });
             });
         }
+    });
+
+    fastify.get('/:list_id/:todo_id', { preHandler: fastify.isAuthenticated }, (req, res) => {
+        const ref = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}/todo/${req.params.todo_id}`);
+
+        ref.on('value', result => {
+            res.send({
+                data: {
+                    todo: result
+                }
+            });
+        });
+    });
+
+    fastify.get('/:list_id', { preHandler: fastify.isAuthenticated }, (req, res) => {
+        const ref = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}`);
+
+        ref.on('value', result => {
+            res.send({
+                data: {
+                    list: result
+                }
+            });
+        });
+    });
+
+    fastify.delete('/:list_id/:todo_id', { preHandler: fastify.isAuthenticated }, (req, res) => {
+        const ref = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}/todo/${req.params.todo_id}`);
+        ref.remove((result) => {
+            console.log(result);
+            res.send({
+                message: 'todo deleted successfully'
+            });
+        });
     });
 
     next();

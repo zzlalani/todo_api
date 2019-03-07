@@ -11,7 +11,7 @@ module.exports = function (fastify, opts, next) {
         }
     };
 
-    fastify.post('/personal', { preHandler: fastify.isAuthenticated,  schema: personalListSchema, attachValidation: true }, (req, res) => {
+    fastify.post('/personal', { preHandler: fastify.isAuthenticated, schema: personalListSchema, attachValidation: true }, (req, res) => {
         if ( req.validationError ) {
             res.code(400).send(req.validationError);
         } else {
@@ -46,7 +46,7 @@ module.exports = function (fastify, opts, next) {
         }
     };
 
-    fastify.post('/collaborative', { preHandler: fastify.isAuthenticated,  schema: collaborativeListSchema, attachValidation: true }, (req, res) => {
+    fastify.post('/collaborative', { preHandler: fastify.isAuthenticated, schema: collaborativeListSchema, attachValidation: true }, (req, res) => {
         if ( req.validationError ) {
             res.code(400).send(req.validationError);
         } else {
@@ -81,7 +81,6 @@ module.exports = function (fastify, opts, next) {
         const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST);
 
         ref.on('value', (result) => {
-
             let todoList = [];
             result.forEach(val => {
                 if (val.child('users').val().indexOf(user.uid) >= 0) {
