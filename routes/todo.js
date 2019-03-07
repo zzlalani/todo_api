@@ -37,5 +37,27 @@ module.exports = function (fastify, opts, next) {
         }
     });
 
+    fastify.put('/:list_id/:todo_id', { preHandler: fastify.isAuthenticated,  schema: todoSchema, attachValidation: true }, (req, res) => {
+        if ( req.validationError ) {
+            res.code(400).send(req.validationError);
+        } else {
+            const user = fastify.firebase.auth().currentUser;
+            const ref = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}/todo/${req.params.todo_id}`);
+            let datetime = new Date().toISOString();
+            ref.update({
+                title: req.body.title, // todo_item title
+                updated_at: datetime,
+            }).then(() => {
+                res.code(201).send({
+                    message: 'todo updated successfully'
+                });
+            }).catch(err => {
+                res.send({
+                    message: err.message
+                });
+            });
+        }
+    });
+
     next();
 };
