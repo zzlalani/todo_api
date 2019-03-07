@@ -1,7 +1,6 @@
 module.exports = function (fastify, opts, next) {
 
-    const PERSONAL = 1;
-    const COLLABORATIVE = 2;
+
 
     const personalListSchema = {
         body: {
@@ -19,14 +18,20 @@ module.exports = function (fastify, opts, next) {
             res.code(400).send(req.validationError);
         } else {
             let user = fastify.firebase.auth().currentUser;
-            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST);
+            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST_PERSONAL);
             ref.push({
-                name: req.body.name,
-                type: PERSONAL,
-                users: [user.uid]
+                name: req.body.name, // list name
+                users: [user.uid], // users of the list
+                admins: [] // keep the empty values to reduce checks at frontend
+            }).then(() => {
+                res.code(201).send({
+                    message: 'todo list added successfully'
+                });
+            }).catch(err => {
+                res.send({
+                    message: err.message
+                });
             });
-
-            res.send({});
         }
     });
 
@@ -47,18 +52,27 @@ module.exports = function (fastify, opts, next) {
             res.code(400).send(req.validationError);
         } else {
             let user = fastify.firebase.auth().currentUser;
-            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST);
+            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST_COLLABORATIVE);
             let listUsers = req.body.users;
-            listUsers.push(user.uid);
+
+            // add if not already in the list
+            if (listUsers.indexOf(listUsers.splice) < 0)
+                listUsers.push(user.uid);
 
             ref.push({
-                name: req.body.name,
-                type: COLLABORATIVE,
-                users: listUsers,
-                admin: user.uid
+                name: req.body.name, // list name
+                users: listUsers, // users of the list
+                admins: [user.uid] // owner/s of the list
+            }).then(() => {
+                res.code(201).send({
+                    message: 'todo list added successfully'
+                });
+            }).catch(err => {
+                res.send({
+                    message: err.message
+                });
             });
 
-            res.send({});
         }
     });
 
