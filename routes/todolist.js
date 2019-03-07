@@ -1,7 +1,5 @@
 module.exports = function (fastify, opts, next) {
 
-
-
     const personalListSchema = {
         body: {
             type: 'object',
@@ -86,8 +84,12 @@ module.exports = function (fastify, opts, next) {
 
             let todoList = [];
             result.forEach(val => {
-                if (val.child('users').val().indexOf(user.uid) >= 0)
-                    todoList.push(val);
+                if (val.child('users').val().indexOf(user.uid) >= 0) {
+                    let ele = Object.assign({
+                        _id: val.key
+                    }, val.toJSON());
+                    todoList.push(ele);
+                }
             });
             res.send({
                 data: {

@@ -41,6 +41,9 @@ fastify.register(require('./routes/auth'), { prefix: '/' });
 // todolist
 fastify.register(require('./routes/todolist'), { prefix: '/todolist', db: firebaseDB, admin: firebaseAdmin });
 
+// todo CRUD
+fastify.register(require('./routes/todo'), { prefix: '/todo', db: firebaseDB, admin: firebaseAdmin });
+
 // Run the server!
 fastify.listen(3000, (err, address) => {
     if (err) throw err;
