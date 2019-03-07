@@ -78,12 +78,22 @@ module.exports = function (fastify, opts, next) {
         }
     });
 
-    fastify.get('/', (req, res) => {
+    fastify.get('/', { preHandler: fastify.isAuthenticated }, (req, res) => {
         const user = fastify.firebase.auth().currentUser;
         const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST);
-        ref.orderByChild('users').equalTo(user.uid).on('value', (result) => {
-            console.log(result);
-            res.send({});
+
+        ref.on('value', (result) => {
+
+            let todoList = [];
+            result.forEach(val => {
+                if (val.child('users').val().indexOf(user.uid) >= 0)
+                    todoList.push(val);
+            });
+            res.send({
+                data: {
+                    lists: todoList
+                }
+            });
         });
     });
 
