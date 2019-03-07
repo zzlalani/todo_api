@@ -39,7 +39,7 @@ fastify.get('/', (req, res) => {
 fastify.register(require('./routes/auth'), { prefix: '/' });
 
 // todolist
-fastify.register(require('./routes/todolist'), { prefix: '/todolist', db: firebaseDB, admin: firebaseAdmin });
+fastify.register(require('./routes/todolist'), { preHandler: fastify.isAuthenticated, prefix: '/todolist', db: firebaseDB, admin: firebaseAdmin });
 
 // Run the server!
 fastify.listen(3000, (err, address) => {

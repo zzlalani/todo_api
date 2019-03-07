@@ -17,10 +17,11 @@ module.exports = function (fastify, opts, next) {
         if ( req.validationError ) {
             res.code(400).send(req.validationError);
         } else {
-            let user = fastify.firebase.auth().currentUser;
-            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST_PERSONAL);
+            const user = fastify.firebase.auth().currentUser;
+            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST);
             ref.push({
                 name: req.body.name, // list name
+                type: fastify.constants.TYPES.PERSONAL, // type of the list
                 users: [user.uid], // users of the list
                 admins: [] // keep the empty values to reduce checks at frontend
             }).then(() => {
@@ -51,8 +52,8 @@ module.exports = function (fastify, opts, next) {
         if ( req.validationError ) {
             res.code(400).send(req.validationError);
         } else {
-            let user = fastify.firebase.auth().currentUser;
-            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST_COLLABORATIVE);
+            const user = fastify.firebase.auth().currentUser;
+            const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST);
             let listUsers = req.body.users;
 
             // add if not already in the list
@@ -61,6 +62,7 @@ module.exports = function (fastify, opts, next) {
 
             ref.push({
                 name: req.body.name, // list name
+                type: fastify.constants.TYPES.COLLABORATIVE, // type of the list
                 users: listUsers, // users of the list
                 admins: [user.uid] // owner/s of the list
             }).then(() => {
@@ -74,6 +76,15 @@ module.exports = function (fastify, opts, next) {
             });
 
         }
+    });
+
+    fastify.get('/', (req, res) => {
+        const user = fastify.firebase.auth().currentUser;
+        const ref = opts.db.ref(fastify.constants.REFERENCES.TODO_LIST);
+        ref.orderByChild('users').equalTo(user.uid).on('value', (result) => {
+            console.log(result);
+            res.send({});
+        });
     });
 
     next();
