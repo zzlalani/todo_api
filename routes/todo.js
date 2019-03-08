@@ -85,9 +85,14 @@ module.exports = function (fastify, opts, next) {
 
     fastify.delete('/:list_id/:todo_id', { preHandler: fastify.isAuthenticated }, (req, res) => {
         const ref = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}/todo/${req.params.todo_id}`);
-        ref.remove((result) => {
+        
+        ref.remove().then(() => {
             res.send({
                 message: 'todo deleted successfully'
+            });
+        }).catch(err => {
+            res.send({
+                message: err.message
             });
         });
     });
