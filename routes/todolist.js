@@ -58,7 +58,7 @@ module.exports = function (fastify, opts, next) {
             if (listUsers.indexOf(listUsers.splice) < 0)
                 listUsers.push(user.uid);
 
-            ref.push({
+            let newTopicList = ref.push({
                 name: req.body.name, // list name
                 type: fastify.constants.TYPES.COLLABORATIVE, // type of the list
                 users: listUsers, // users of the list
@@ -67,6 +67,13 @@ module.exports = function (fastify, opts, next) {
                 res.code(201).send({
                     message: 'todo list added successfully'
                 });
+
+                // subscribe users FCM SDKs client registration tokens with new topic
+                let registrationTokens = [];
+                // where as the topic will be the key/id of the created todo list
+                let topic = newTopicList.key;
+                // fastify.pushNotifications.subscribeToTopic( opts.admin, registrationTokens, topic);
+
             }).catch(err => {
                 res.send({
                     message: err.message

@@ -26,6 +26,7 @@ const firebaseDB = firebaseAdmin.database();
 fastify.register(require('./plugins/fastify-firebase'));
 fastify.register(require('./middlewares/authenticated'));
 fastify.register(require('./plugins/constants'));
+fastify.register(require('./plugins/notifications'));
 
 
 fastify.get('/', (req, res) => {

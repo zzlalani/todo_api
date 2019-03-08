@@ -34,6 +34,13 @@ module.exports = function (fastify, opts, next) {
                     message: err.message
                 });
             });
+
+            // send push notifications if the list is collaborative
+            ref.on('value', (snapshot) => {
+                if (snapshot.val().type === fastify.constants.TYPES.COLLABORATIVE) {
+                    fastify.pushNotifications.sendNotification(opts.admin, `New todo created`, `New todo item is created in list ${snapshot.val().title} with title ${req.body.title}`, req.params.list_id);
+                }
+            });
         }
     });
 
@@ -85,7 +92,7 @@ module.exports = function (fastify, opts, next) {
 
     fastify.delete('/:list_id/:todo_id', { preHandler: fastify.isAuthenticated }, (req, res) => {
         const ref = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}/todo/${req.params.todo_id}`);
-        
+
         ref.remove().then(() => {
             res.send({
                 message: 'todo deleted successfully'
