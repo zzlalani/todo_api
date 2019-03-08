@@ -3,12 +3,16 @@ const fastify = require('fastify')({
     logger: true
 });
 
+// importing environment variables
 require('custom-env').env('development');
 
+// firebase admin library
 const firebaseAdmin = require("firebase-admin");
 
+// fastify formbody middleware
 fastify.register(require('fastify-formbody'));
 
+// firebase auth library
 fastify.register(require('fastify-firebase-auth'), {
     apiKey: process.env.APIKEY,
     databaseURL: process.env.DATABASEURL,
@@ -16,6 +20,7 @@ fastify.register(require('fastify-firebase-auth'), {
     storageBucket: process.env.STORAGEBUCKET
 });
 
+// importing firebase service account json file to initialize firebase-admin
 const serviceAccount = require(process.env.SERVICEACCOUNTKEYPATH);
 firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert(serviceAccount),
@@ -23,29 +28,26 @@ firebaseAdmin.initializeApp({
 });
 const firebaseDB = firebaseAdmin.database();
 
+// fastify custom plugins
 fastify.register(require('./plugins/fastify-firebase'));
 fastify.register(require('./middlewares/authenticated'));
 fastify.register(require('./plugins/constants'));
 fastify.register(require('./plugins/notifications'));
 
-
+// get test webservice at /
 fastify.get('/', (req, res) => {
     res.send({
         'message': 'Welcome to Todo App WebServices'
     })
 });
 
-// auth
+// auth routes
 fastify.register(require('./routes/auth'), { prefix: '/' });
 
-// todolist
+// todolist routes
 fastify.register(require('./routes/todolist'), { prefix: '/todolist', db: firebaseDB, admin: firebaseAdmin });
 
-// todo CRUD
+// todo routes
 fastify.register(require('./routes/todo'), { prefix: '/todo', db: firebaseDB, admin: firebaseAdmin });
 
-// Run the server!
-fastify.listen(3000, (err, address) => {
-    if (err) throw err;
-    fastify.log.info(`server listening on ${address}`);
-});
+module.exports = fastify;
