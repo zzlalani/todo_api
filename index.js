@@ -23,7 +23,6 @@ firebaseAdmin.initializeApp({
 });
 const firebaseDB = firebaseAdmin.database();
 
-
 fastify.register(require('./plugins/fastify-firebase'));
 fastify.register(require('./middlewares/authenticated'));
 fastify.register(require('./plugins/constants'));
