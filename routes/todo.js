@@ -63,6 +63,14 @@ module.exports = function (fastify, opts, next) {
                     message: err.message
                 });
             });
+
+            // send push notifications if the list is collaborative
+            const listRef = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}`);
+            listRef.on('value', (snapshot) => {
+                if (snapshot.val().type === fastify.constants.TYPES.COLLABORATIVE) {
+                    fastify.pushNotifications.sendNotification(opts.admin, `Todo item updated`, `Todo item in list ${snapshot.val().title} updated to title ${req.body.title}`, req.params.list_id);
+                }
+            });
         }
     });
 
@@ -101,6 +109,14 @@ module.exports = function (fastify, opts, next) {
             res.send({
                 message: err.message
             });
+        });
+
+        // send push notifications if the list is collaborative
+        const listRef = opts.db.ref(`${fastify.constants.REFERENCES.TODO_LIST}/${req.params.list_id}`);
+        listRef.on('value', (snapshot) => {
+            if (snapshot.val().type === fastify.constants.TYPES.COLLABORATIVE) {
+                fastify.pushNotifications.sendNotification(opts.admin, `Todo item deleted`, `Todo item in list ${snapshot.val().title} deleted`, req.params.list_id);
+            }
         });
     });
 
